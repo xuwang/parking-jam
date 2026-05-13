@@ -83,7 +83,8 @@
     align-items: center;
     justify-content: center;
     font-size: 18px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.2);
+    border: 2px solid rgba(0,0,0,0.45);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.25), inset 0 0 0 1px rgba(255,255,255,0.15);
     z-index: 10;
     touch-action: none;
     -webkit-touch-callout: none;
@@ -242,9 +243,10 @@
 
 <div id="overlay"></div>
 <div id="message">
-  <h2>🎉 Level Complete!</h2>
+  <h2 id="msg-title">🎉 Level Complete!</h2>
   <p id="msg-text">You solved it!</p>
   <button id="btn-msg-next" style="background:linear-gradient(135deg,#6fcf97,#27ae60);color:#fff">Next Level →</button>
+  <button id="btn-msg-restart" style="background:linear-gradient(135deg,#56ccf2,#2f80ed);color:#fff;display:none;margin-left:8px">↺ Play Again</button>
 </div>
 
 <script>
@@ -272,129 +274,129 @@ const LEVELS = [
   // Level 1 - very easy (2 moves)
   {
     cars: [
-      { id:0, col:0, row:2, len:2, horiz:true,  color:'#e74c3c', target:true },
-      { id:1, col:3, row:2, len:2, horiz:false, color:'#3498db' },
-      { id:2, col:0, row:0, len:2, horiz:true,  color:'#2ecc71' },
-      { id:3, col:4, row:4, len:2, horiz:true,  color:'#9b59b6' },
+      { id:0, col:0, row:2, len:2, horiz:true,  color:'#ef4444', target:true },
+      { id:1, col:3, row:2, len:2, horiz:false, color:'#2563eb' },
+      { id:2, col:0, row:0, len:2, horiz:true,  color:'#22c55e' },
+      { id:3, col:4, row:4, len:2, horiz:true,  color:'#a855f7' },
     ],
     solution: [{id:1,dir:1,steps:2},{id:0,dir:1,steps:4}]
   },
   // Level 2 (2 moves)
   {
     cars: [
-      { id:0, col:1, row:2, len:2, horiz:true,  color:'#e74c3c', target:true },
-      { id:1, col:3, row:0, len:2, horiz:false, color:'#3498db' },
-      { id:2, col:3, row:2, len:2, horiz:false, color:'#e67e22' },
-      { id:3, col:4, row:1, len:2, horiz:true,  color:'#2ecc71' },
-      { id:4, col:0, row:0, len:3, horiz:false, color:'#9b59b6' },
+      { id:0, col:1, row:2, len:2, horiz:true,  color:'#ef4444', target:true },
+      { id:1, col:3, row:0, len:2, horiz:false, color:'#2563eb' },
+      { id:2, col:3, row:2, len:2, horiz:false, color:'#f97316' },
+      { id:3, col:4, row:1, len:2, horiz:true,  color:'#22c55e' },
+      { id:4, col:0, row:0, len:3, horiz:false, color:'#a855f7' },
     ],
     solution: [{id:2,dir:1,steps:2},{id:0,dir:1,steps:3}]
   },
   // Level 3 (3 moves)
   {
     cars: [
-      { id:0, col:0, row:2, len:2, horiz:true,  color:'#e74c3c', target:true },
-      { id:1, col:3, row:1, len:2, horiz:false, color:'#3498db' },
-      { id:2, col:5, row:2, len:2, horiz:false, color:'#e67e22' },
-      { id:3, col:0, row:0, len:3, horiz:true,  color:'#2ecc71' },
-      { id:4, col:4, row:0, len:2, horiz:false, color:'#9b59b6' },
-      { id:5, col:2, row:4, len:2, horiz:true,  color:'#1abc9c' },
+      { id:0, col:0, row:2, len:2, horiz:true,  color:'#ef4444', target:true },
+      { id:1, col:3, row:1, len:2, horiz:false, color:'#2563eb' },
+      { id:2, col:5, row:2, len:2, horiz:false, color:'#f97316' },
+      { id:3, col:0, row:0, len:3, horiz:true,  color:'#22c55e' },
+      { id:4, col:4, row:0, len:2, horiz:false, color:'#a855f7' },
+      { id:5, col:2, row:4, len:2, horiz:true,  color:'#f5f5f5' },
     ],
     solution: [{id:1,dir:-1,steps:1},{id:2,dir:1,steps:2},{id:0,dir:1,steps:4}]
   },
   // Level 4 (4 moves)
   {
     cars: [
-      { id:0, col:0, row:2, len:2, horiz:true,  color:'#e74c3c', target:true },
-      { id:1, col:2, row:2, len:2, horiz:false, color:'#3498db' },
-      { id:2, col:4, row:1, len:2, horiz:false, color:'#e67e22' },
-      { id:3, col:5, row:2, len:2, horiz:false, color:'#2ecc71' },
-      { id:4, col:2, row:0, len:2, horiz:true,  color:'#9b59b6' },
-      { id:5, col:0, row:4, len:2, horiz:true,  color:'#1abc9c' },
+      { id:0, col:0, row:2, len:2, horiz:true,  color:'#ef4444', target:true },
+      { id:1, col:2, row:2, len:2, horiz:false, color:'#2563eb' },
+      { id:2, col:4, row:1, len:2, horiz:false, color:'#f97316' },
+      { id:3, col:5, row:2, len:2, horiz:false, color:'#22c55e' },
+      { id:4, col:2, row:0, len:2, horiz:true,  color:'#a855f7' },
+      { id:5, col:0, row:4, len:2, horiz:true,  color:'#f5f5f5' },
     ],
     solution: [{id:1,dir:1,steps:2},{id:2,dir:1,steps:2},{id:3,dir:1,steps:2},{id:0,dir:1,steps:4}]
   },
   // Level 5 (4 moves)
   {
     cars: [
-      { id:0, col:0, row:2, len:2, horiz:true,  color:'#e74c3c', target:true },
-      { id:1, col:2, row:1, len:2, horiz:false, color:'#3498db' },
-      { id:2, col:3, row:2, len:2, horiz:false, color:'#e67e22' },
-      { id:3, col:5, row:1, len:2, horiz:false, color:'#9b59b6' },
-      { id:4, col:4, row:0, len:2, horiz:false, color:'#2ecc71' },
-      { id:5, col:0, row:0, len:2, horiz:true,  color:'#1abc9c' },
-      { id:6, col:3, row:5, len:3, horiz:true,  color:'#f39c12' },
+      { id:0, col:0, row:2, len:2, horiz:true,  color:'#ef4444', target:true },
+      { id:1, col:2, row:1, len:2, horiz:false, color:'#2563eb' },
+      { id:2, col:3, row:2, len:2, horiz:false, color:'#f97316' },
+      { id:3, col:5, row:1, len:2, horiz:false, color:'#a855f7' },
+      { id:4, col:4, row:0, len:2, horiz:false, color:'#22c55e' },
+      { id:5, col:0, row:0, len:2, horiz:true,  color:'#f5f5f5' },
+      { id:6, col:3, row:5, len:3, horiz:true,  color:'#facc15' },
     ],
     solution: [{id:1,dir:-1,steps:1},{id:2,dir:1,steps:1},{id:3,dir:1,steps:2},{id:0,dir:1,steps:4}]
   },
   // Level 6 (5 moves)
   {
     cars: [
-      { id:0, col:0, row:2, len:2, horiz:true,  color:'#e74c3c', target:true },
-      { id:1, col:2, row:2, len:2, horiz:false, color:'#3498db' },
-      { id:2, col:3, row:1, len:2, horiz:false, color:'#2ecc71' },
-      { id:3, col:4, row:2, len:2, horiz:false, color:'#e67e22' },
-      { id:4, col:5, row:1, len:2, horiz:false, color:'#9b59b6' },
-      { id:5, col:4, row:0, len:2, horiz:true,  color:'#1abc9c' },
-      { id:6, col:0, row:0, len:3, horiz:true,  color:'#f39c12' },
-      { id:7, col:0, row:4, len:2, horiz:true,  color:'#e91e63' },
+      { id:0, col:0, row:2, len:2, horiz:true,  color:'#ef4444', target:true },
+      { id:1, col:2, row:2, len:2, horiz:false, color:'#2563eb' },
+      { id:2, col:3, row:1, len:2, horiz:false, color:'#22c55e' },
+      { id:3, col:4, row:2, len:2, horiz:false, color:'#f97316' },
+      { id:4, col:5, row:1, len:2, horiz:false, color:'#a855f7' },
+      { id:5, col:4, row:0, len:2, horiz:true,  color:'#f5f5f5' },
+      { id:6, col:0, row:0, len:3, horiz:true,  color:'#facc15' },
+      { id:7, col:0, row:4, len:2, horiz:true,  color:'#ec4899' },
     ],
     solution: [{id:4,dir:1,steps:2},{id:3,dir:1,steps:2},{id:2,dir:-1,steps:1},{id:1,dir:1,steps:2},{id:0,dir:1,steps:4}]
   },
   // Level 7 (5 moves)
   {
     cars: [
-      { id:0, col:0, row:2, len:2, horiz:true,  color:'#e74c3c', target:true },
-      { id:1, col:2, row:2, len:2, horiz:false, color:'#3498db' },
-      { id:2, col:4, row:1, len:2, horiz:false, color:'#2ecc71' },
-      { id:3, col:5, row:2, len:2, horiz:false, color:'#e67e22' },
-      { id:4, col:4, row:4, len:2, horiz:false, color:'#9b59b6' },
-      { id:5, col:3, row:0, len:2, horiz:true,  color:'#1abc9c' },
-      { id:6, col:0, row:0, len:2, horiz:true,  color:'#f39c12' },
-      { id:7, col:2, row:5, len:2, horiz:true,  color:'#e91e63' },
+      { id:0, col:0, row:2, len:2, horiz:true,  color:'#ef4444', target:true },
+      { id:1, col:2, row:2, len:2, horiz:false, color:'#2563eb' },
+      { id:2, col:4, row:1, len:2, horiz:false, color:'#22c55e' },
+      { id:3, col:5, row:2, len:2, horiz:false, color:'#f97316' },
+      { id:4, col:4, row:4, len:2, horiz:false, color:'#a855f7' },
+      { id:5, col:3, row:0, len:2, horiz:true,  color:'#f5f5f5' },
+      { id:6, col:0, row:0, len:2, horiz:true,  color:'#facc15' },
+      { id:7, col:2, row:5, len:2, horiz:true,  color:'#ec4899' },
     ],
     solution: [{id:5,dir:-1,steps:1},{id:2,dir:-1,steps:1},{id:1,dir:1,steps:1},{id:3,dir:1,steps:2},{id:0,dir:1,steps:4}]
   },
   // Level 8 (5 moves)
   {
     cars: [
-      { id:0, col:1, row:2, len:2, horiz:true,  color:'#e74c3c', target:true },
-      { id:1, col:3, row:1, len:2, horiz:false, color:'#3498db' },
-      { id:2, col:4, row:2, len:2, horiz:false, color:'#2ecc71' },
-      { id:3, col:5, row:1, len:2, horiz:false, color:'#e67e22' },
-      { id:4, col:3, row:0, len:2, horiz:true,  color:'#9b59b6' },
-      { id:5, col:0, row:0, len:2, horiz:true,  color:'#1abc9c' },
-      { id:6, col:4, row:4, len:2, horiz:false, color:'#f39c12' },
-      { id:7, col:1, row:4, len:2, horiz:true,  color:'#e91e63' },
-      { id:8, col:0, row:3, len:2, horiz:true,  color:'#00bcd4' },
+      { id:0, col:1, row:2, len:2, horiz:true,  color:'#ef4444', target:true },
+      { id:1, col:3, row:1, len:2, horiz:false, color:'#2563eb' },
+      { id:2, col:4, row:2, len:2, horiz:false, color:'#22c55e' },
+      { id:3, col:5, row:1, len:2, horiz:false, color:'#f97316' },
+      { id:4, col:3, row:0, len:2, horiz:true,  color:'#a855f7' },
+      { id:5, col:0, row:0, len:2, horiz:true,  color:'#f5f5f5' },
+      { id:6, col:4, row:4, len:2, horiz:false, color:'#facc15' },
+      { id:7, col:1, row:4, len:2, horiz:true,  color:'#ec4899' },
+      { id:8, col:0, row:3, len:2, horiz:true,  color:'#78350f' },
     ],
     solution: [{id:4,dir:-1,steps:1},{id:3,dir:-1,steps:1},{id:1,dir:1,steps:2},{id:2,dir:-1,steps:2},{id:0,dir:1,steps:3}]
   },
   // Level 9 (5 moves)
   {
     cars: [
-      { id:0, col:0, row:2, len:2, horiz:true,  color:'#e74c3c', target:true },
-      { id:1, col:2, row:2, len:2, horiz:false, color:'#3498db' },
-      { id:2, col:3, row:1, len:2, horiz:false, color:'#2ecc71' },
-      { id:3, col:4, row:2, len:2, horiz:false, color:'#e67e22' },
-      { id:4, col:5, row:1, len:2, horiz:false, color:'#9b59b6' },
-      { id:5, col:3, row:0, len:2, horiz:true,  color:'#1abc9c' },
-      { id:6, col:0, row:0, len:2, horiz:true,  color:'#f39c12' },
-      { id:7, col:0, row:4, len:3, horiz:true,  color:'#e91e63' },
+      { id:0, col:0, row:2, len:2, horiz:true,  color:'#ef4444', target:true },
+      { id:1, col:2, row:2, len:2, horiz:false, color:'#2563eb' },
+      { id:2, col:3, row:1, len:2, horiz:false, color:'#22c55e' },
+      { id:3, col:4, row:2, len:2, horiz:false, color:'#f97316' },
+      { id:4, col:5, row:1, len:2, horiz:false, color:'#a855f7' },
+      { id:5, col:3, row:0, len:2, horiz:true,  color:'#f5f5f5' },
+      { id:6, col:0, row:0, len:2, horiz:true,  color:'#facc15' },
+      { id:7, col:0, row:4, len:3, horiz:true,  color:'#ec4899' },
     ],
     solution: [{id:1,dir:-1,steps:2},{id:2,dir:1,steps:2},{id:3,dir:1,steps:2},{id:4,dir:-1,steps:1},{id:0,dir:1,steps:4}]
   },
   // Level 10 (7 moves)
   {
     cars: [
-      { id:0, col:0, row:2, len:2, horiz:true,  color:'#e74c3c', target:true },
-      { id:1, col:2, row:1, len:2, horiz:false, color:'#3498db' },
-      { id:2, col:3, row:2, len:2, horiz:false, color:'#2ecc71' },
-      { id:3, col:4, row:1, len:2, horiz:false, color:'#e67e22' },
-      { id:4, col:5, row:1, len:2, horiz:false, color:'#9b59b6' },
-      { id:5, col:4, row:0, len:2, horiz:true,  color:'#1abc9c' },
-      { id:6, col:0, row:0, len:3, horiz:true,  color:'#f39c12' },
-      { id:7, col:2, row:4, len:2, horiz:true,  color:'#e91e63' },
+      { id:0, col:0, row:2, len:2, horiz:true,  color:'#ef4444', target:true },
+      { id:1, col:2, row:1, len:2, horiz:false, color:'#2563eb' },
+      { id:2, col:3, row:2, len:2, horiz:false, color:'#22c55e' },
+      { id:3, col:4, row:1, len:2, horiz:false, color:'#f97316' },
+      { id:4, col:5, row:1, len:2, horiz:false, color:'#a855f7' },
+      { id:5, col:4, row:0, len:2, horiz:true,  color:'#f5f5f5' },
+      { id:6, col:0, row:0, len:3, horiz:true,  color:'#facc15' },
+      { id:7, col:2, row:4, len:2, horiz:true,  color:'#ec4899' },
     ],
     solution: [{id:7,dir:-1,steps:2},{id:2,dir:1,steps:2},{id:1,dir:1,steps:2},{id:5,dir:-1,steps:1},{id:4,dir:-1,steps:1},{id:3,dir:1,steps:2},{id:0,dir:1,steps:4}]
   },
@@ -509,6 +511,8 @@ const message = document.getElementById('message');
 const overlay = document.getElementById('overlay');
 const msgText = document.getElementById('msg-text');
 const btnMsgNext = document.getElementById('btn-msg-next');
+const btnMsgRestart = document.getElementById('btn-msg-restart');
+const msgTitle = document.getElementById('msg-title');
 
 function cellPx(n) { return n * (CELL + GAP); }
 
@@ -556,9 +560,15 @@ function renderCars() {
     el.style.top = cellPx(car.row) + 'px';
     el.style.background = car.color;
 
-    // icon
-    el.textContent = car.target ? '🚗' : ['🚙','🚕','🚌','🚎','🏎️','🚐','🚑','🚒','🛻'][car.id % 9];
-    el.style.fontSize = car.len >= 3 ? '22px' : '18px';
+    // icon — emojis face left by default; flip horizontals to face the exit,
+    // rotate verticals so they point along their axis
+    const icon = document.createElement('span');
+    icon.textContent = car.target ? '🚗' : ['🚙','🚕','🚌','🚎','🏎️','🚐','🚑','🚒','🛻'][car.id % 9];
+    icon.style.display = 'inline-block';
+    icon.style.fontSize = Math.round(CELL * 0.7) + 'px';
+    icon.style.lineHeight = '1';
+    icon.style.transform = car.horiz ? 'scaleX(-1)' : 'rotate(90deg)';
+    el.appendChild(icon);
 
     board.appendChild(el);
     attachDrag(el, car);
@@ -625,12 +635,16 @@ function checkWin() {
 
 function showWin() {
   if (currentLevel < LEVELS.length - 1) {
+    msgTitle.textContent = '🎉 Level Complete!';
     msgText.textContent = `Solved in ${moveCount} moves! Ready for level ${currentLevel + 2}?`;
     btnMsgNext.style.display = '';
+    btnMsgRestart.style.display = 'none';
     playWin();
   } else {
+    msgTitle.textContent = '🏆 All Levels Cleared!';
     msgText.textContent = `You completed all 10 levels! You're a parking master!`;
     btnMsgNext.style.display = 'none';
+    btnMsgRestart.style.display = '';
     playApplause();
     launchApplause();
   }
@@ -848,6 +862,12 @@ btnMsgNext.addEventListener('click', () => {
   message.classList.remove('show');
   overlay.classList.remove('show');
   if (currentLevel < LEVELS.length - 1) loadLevel(currentLevel + 1);
+});
+btnMsgRestart.addEventListener('click', () => {
+  playClick();
+  message.classList.remove('show');
+  overlay.classList.remove('show');
+  loadLevel(0);
 });
 overlay.addEventListener('click', () => {
   message.classList.remove('show');
