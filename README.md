@@ -2,6 +2,10 @@
 
 A small browser-based sliding-block puzzle. Move cars on a 6×6 grid to clear a path for the red car to exit. Single-file vanilla JS — no build step, no dependencies.
 
+<p align="center">
+  <img src="screenshot.png" alt="Parking Jam — level 9 of 10" width="360">
+</p>
+
 ## Features
 
 - 10 hand-crafted levels with built-in solutions
