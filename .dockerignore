@@ -1,0 +1,11 @@
+.git
+.gitignore
+.claude
+.DS_Store
+**/.DS_Store
+.server.pid
+Makefile
+Dockerfile
+.dockerignore
+README*
+*.md

@@ -1,0 +1,14 @@
+{
+  "name": "Parking Jam",
+  "short_name": "Parking Jam",
+  "description": "Slide cars to clear the path! 10 puzzle levels.",
+  "start_url": "/index.html",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#1a1a2e",
+  "theme_color": "#1a1a2e",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}
