@@ -8,7 +8,8 @@ TAG ?= latest
 DOCKER_PORT ?= 8080
 
 .PHONY: help serve start stop restart open lan bump clean \
-        docker-build docker-run docker-stop docker-push docker-shell
+        docker-build docker-run docker-stop docker-push docker-shell \
+        publish
 
 help:
 	@echo "Targets:"
@@ -26,6 +27,9 @@ help:
 	@echo "  docker-run    - build + run on host port $(DOCKER_PORT)"
 	@echo "  docker-stop   - stop and remove the container"
 	@echo "  docker-push   - push $(IMAGE):$(TAG)"
+	@echo ""
+	@echo "Deploy:"
+	@echo "  publish  - merge main into gh-pages and push to GitHub"
 
 serve:
 	python3 -m http.server $(PORT) --bind $(HOST)
@@ -81,3 +85,10 @@ docker-shell:
 
 docker-push:
 	docker push $(IMAGE):$(TAG)
+
+publish:
+	@git checkout gh-pages
+	@git merge main --no-edit
+	@git push github gh-pages
+	@git checkout main
+	@echo "published to https://xuwang.github.io/parking-jam/"
