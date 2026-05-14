@@ -1,10 +1,11 @@
-const CACHE_NAME = 'parking-jam-v12';
+const CACHE_NAME = 'parking-jam-v13';
 const ASSETS = [
-  '/',
-  '/index.html',
-  '/manifest.json',
-  '/icon-192.png',
-  '/icon-512.png'
+  './',
+  './index.html',
+  './manifest.json',
+  './icon-192.png',
+  './icon-512.png',
+  './screenshot.png'
 ];
 
 self.addEventListener('install', e => {

@@ -1,9 +1,13 @@
 # Parking Jam
 
+**[Play it →](https://xuwang.github.io/parking-jam/)**
+
 A small browser-based sliding-block puzzle. Move cars on a 6×6 grid to clear a path for the red car to exit. Single-file vanilla JS — no build step, no dependencies.
 
 <p align="center">
-  <img src="screenshot.png" alt="Parking Jam — level 9 of 10" width="360">
+  <a href="https://xuwang.github.io/parking-jam/">
+    <img src="screenshot.png" alt="Parking Jam — click to play" width="360">
+  </a>
 </p>
 
 ## Features
