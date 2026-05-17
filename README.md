@@ -2,7 +2,7 @@
 
 **[Play it →](https://xuwang.github.io/parking-jam/)**
 
-A small browser-based sliding-block puzzle. Move cars on a 6×6 grid to clear a path for the red car to exit. Single-file vanilla JS — no build step, no dependencies.
+A small browser-based sliding-block puzzle. Move cars on a 6×6 grid to clear a path for the ambulance to exit. Single-file vanilla JS — no build step, no dependencies.
 
 <p align="center">
   <a href="https://xuwang.github.io/parking-jam/">
@@ -15,6 +15,7 @@ A small browser-based sliding-block puzzle. Move cars on a 6×6 grid to clear a 
 - 10 hand-crafted levels with built-in solutions
 - Hint button (highlights the next correct move) and full auto-solve playback
 - Reset, level picker dots, move counter
+- Per-car engine sounds; emergency vehicles (ambulance, fire truck, police) have sirens
 - Web Audio sound effects (toggleable)
 - Installable as a PWA (manifest + service worker, works offline)
 - Touch-friendly drag controls, scales to phone screens
@@ -122,13 +123,13 @@ Levels are defined inline in `index.html` as the `LEVELS` array. Each entry:
 ```js
 {
   cars: [
-    { id:0, col:0, row:2, len:2, horiz:true, color:'#e74c3c', target:true },
+    { id:0, col:0, row:2, len:2, horiz:true, color:'#ffffff', target:true },
     ...
   ],
   solution: [{id:1, dir:1, steps:2}, {id:0, dir:1, steps:4}],
 }
 ```
 
-- `id:0` is the target (red) car. It must be horizontal and exits to the right at `EXIT_ROW` (row 2).
+- `id:0` is the target car (ambulance 🚑, white). It must be horizontal and exits to the right at `EXIT_ROW` (row 2).
 - `dir` is `+1` (right/down) or `-1` (left/up); `steps` is how many cells.
 - The `solution` powers both the **Hint** and **Solution** buttons — keep it in sync if you edit `cars`.
