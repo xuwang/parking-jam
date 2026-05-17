@@ -457,23 +457,262 @@ const AudioCtx = window.AudioContext || window.webkitAudioContext;
 let audioCtx;
 function getAudioCtx() {
   if (!audioCtx) audioCtx = new AudioCtx();
+  if (audioCtx.state === 'suspended') audioCtx.resume();
   return audioCtx;
 }
 
 function playMove() {
   if (!soundEnabled) return;
   const ctx = getAudioCtx();
-  const osc = ctx.createOscillator();
+  const t0 = ctx.currentTime;
+  const dur = 0.16;
+
+  const filter = ctx.createBiquadFilter();
+  filter.type = 'lowpass';
+  filter.frequency.setValueAtTime(1200, t0);
+  filter.frequency.exponentialRampToValueAtTime(2400, t0 + 0.05);
+  filter.frequency.exponentialRampToValueAtTime(900, t0 + dur);
+  filter.Q.value = 4;
+
   const gain = ctx.createGain();
-  osc.connect(gain);
+  gain.gain.setValueAtTime(0.0001, t0);
+  gain.gain.exponentialRampToValueAtTime(0.35, t0 + 0.015);
+  gain.gain.exponentialRampToValueAtTime(0.001, t0 + dur);
+  filter.connect(gain);
   gain.connect(ctx.destination);
-  osc.type = 'sine';
-  osc.frequency.setValueAtTime(440, ctx.currentTime);
-  osc.frequency.exponentialRampToValueAtTime(520, ctx.currentTime + 0.08);
-  gain.gain.setValueAtTime(0.15, ctx.currentTime);
-  gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.12);
-  osc.start(ctx.currentTime);
-  osc.stop(ctx.currentTime + 0.12);
+
+  // Detuned sawtooth pair: quick rev from idle to higher rpm and back
+  [-8, 8].forEach((detune) => {
+    const osc = ctx.createOscillator();
+    osc.type = 'sawtooth';
+    osc.detune.value = detune;
+    osc.frequency.setValueAtTime(140, t0);
+    osc.frequency.exponentialRampToValueAtTime(260, t0 + 0.05);
+    osc.frequency.exponentialRampToValueAtTime(170, t0 + dur);
+    osc.connect(filter);
+    osc.start(t0);
+    osc.stop(t0 + dur);
+  });
+}
+
+let engine = null;
+
+function carVoice(car) {
+  // Length sets the base register (truck = low diesel rumble, car = higher revving).
+  // Per-id offsets give each car a distinct pitch and timbre so you can hear which one is moving.
+  const baseIdle = car.len === 3 ? 70 : 140;
+  const pitchShift = ((car.id * 19) % 41) - 20; // -20..+20 Hz
+  const idle = Math.max(40, baseIdle + pitchShift);
+  const rev = idle * 1.9;
+  const cutoffIdle = 900 + ((car.id * 73) % 700); // 900..1600
+  const cutoffRev = cutoffIdle * 2.4;
+  const detune = 5 + (car.id % 7); // 5..11
+  const lfoRate = 5 + (car.id % 5); // 5..9
+  // Sawtooth for most; square for the target car (id=0) and every 3rd car for variety
+  const wave = (car.id === 0 || car.id % 3 === 2) ? 'square' : 'sawtooth';
+  const voice = { idle, rev, cutoffIdle, cutoffRev, detune, lfoRate, wave };
+  // Player car (red target 🚗): only an assertive horn honk on pickup, no engine drone
+  if (car.target) {
+    voice.silent = true;
+    voice.horn = { tones: [300], gap: 0, dur: 0.45, gain: 0.28 };
+  }
+  // Taxi (id 1 = 🚕): impatient dual-tone NYC cab honk — 3 quick BWAAH!s on pickup
+  if (car.id === 1) {
+    voice.idle = 95;
+    voice.rev = 210;
+    voice.cutoffIdle = 1100;
+    voice.cutoffRev = 2300;
+    voice.detune = 11;
+    voice.lfoRate = 3.5;
+    voice.wave = 'sawtooth';
+    voice.horn = { tones: [392, 392, 392], gap: 0.11, dur: 0.13, gain: 0.24, chord: true };
+  }
+  // Emergency vehicles by icon:
+  // id 7 = 🚒 fire engine (wail), id 6 = 🚑 ambulance (two-tone), id 3 = 🚓 police (yelp)
+  if (car.id === 7) {
+    voice.siren = { type: 'wail', carrier: 780, depth: 320, rate: 1.6, gain: 0.35 };
+  } else if (car.id === 6) {
+    voice.siren = { type: 'twotone', high: 980, low: 720, rate: 2.0, gain: 0.32 };
+  } else if (car.id === 3) {
+    voice.siren = { type: 'yelp', carrier: 850, depth: 280, rate: 4.5, gain: 0.32 };
+  }
+  return voice;
+}
+
+function playHorn(cfg) {
+  if (!soundEnabled) return;
+  const ctx = getAudioCtx();
+  const t0 = ctx.currentTime;
+  // Dual-tone car horn uses a major third (freq * 5/4) layered for the classic "BWAAAH"
+  cfg.tones.forEach((freq, i) => {
+    const start = t0 + i * (cfg.gap + cfg.dur);
+    const pitches = cfg.chord ? [freq, freq * 1.25] : [freq];
+
+    const filter = ctx.createBiquadFilter();
+    filter.type = 'lowpass';
+    filter.frequency.value = 1600;
+    filter.Q.value = 3;
+
+    const g = ctx.createGain();
+    g.gain.setValueAtTime(0.0001, start);
+    g.gain.exponentialRampToValueAtTime(cfg.gain, start + 0.01);
+    g.gain.setValueAtTime(cfg.gain, start + cfg.dur - 0.015);
+    g.gain.exponentialRampToValueAtTime(0.0001, start + cfg.dur);
+
+    filter.connect(g);
+    g.connect(ctx.destination);
+
+    pitches.forEach((p) => {
+      [0, 6].forEach((det) => {
+        const osc = ctx.createOscillator();
+        osc.type = 'sawtooth';
+        osc.frequency.value = p;
+        osc.detune.value = det;
+        osc.connect(filter);
+        osc.start(start);
+        osc.stop(start + cfg.dur + 0.02);
+      });
+    });
+  });
+}
+
+function createSiren(ctx, t0, cfg) {
+  const out = ctx.createGain();
+  out.gain.setValueAtTime(0.0001, t0);
+  out.gain.exponentialRampToValueAtTime(cfg.gain, t0 + 0.05);
+  out.connect(ctx.destination);
+
+  // Two detuned triangle oscillators — sharper than sine, less harsh than square.
+  const carriers = [-4, 4].map(() => {
+    const o = ctx.createOscillator();
+    o.type = 'triangle';
+    return o;
+  });
+
+  const lfo = ctx.createOscillator();
+  const lfoGain = ctx.createGain();
+  lfo.connect(lfoGain);
+  carriers.forEach((c) => lfoGain.connect(c.frequency));
+
+  if (cfg.type === 'wail') {
+    carriers.forEach((c, i) => { c.frequency.value = cfg.carrier; c.detune.value = i === 0 ? -7 : 7; });
+    lfo.type = 'sine';
+    lfo.frequency.value = cfg.rate;
+    lfoGain.gain.value = cfg.depth;
+  } else if (cfg.type === 'yelp') {
+    // Sawtooth LFO sweeps frequency up and snaps back — classic police yelp
+    carriers.forEach((c, i) => { c.frequency.value = cfg.carrier; c.detune.value = i === 0 ? -7 : 7; });
+    lfo.type = 'sawtooth';
+    lfo.frequency.value = cfg.rate;
+    lfoGain.gain.value = cfg.depth;
+  } else { // twotone
+    const mid = (cfg.high + cfg.low) / 2;
+    carriers.forEach((c, i) => { c.frequency.value = mid; c.detune.value = i === 0 ? -7 : 7; });
+    lfo.type = 'square';
+    lfo.frequency.value = cfg.rate;
+    lfoGain.gain.value = (cfg.high - cfg.low) / 2;
+  }
+
+  carriers.forEach((c) => { c.connect(out); c.start(t0); });
+  lfo.start(t0);
+  return { carriers, lfo, out };
+}
+
+function startEngine(car) {
+  if (!soundEnabled) return;
+  if (engine) return;
+  const ctx = getAudioCtx();
+  const t0 = ctx.currentTime;
+  const v = carVoice(car);
+
+  const filter = ctx.createBiquadFilter();
+  filter.type = 'lowpass';
+  filter.frequency.setValueAtTime(v.cutoffIdle, t0);
+  filter.Q.value = 3;
+
+  // Silence the engine drone for cars that only need a siren or horn
+  const engineGainPeak = (v.siren || v.silent) ? 0.0001 : 0.16;
+  const gain = ctx.createGain();
+  gain.gain.setValueAtTime(0.0001, t0);
+  gain.gain.exponentialRampToValueAtTime(engineGainPeak, t0 + 0.06);
+  filter.connect(gain);
+  gain.connect(ctx.destination);
+
+  const oscs = [-v.detune, v.detune].map((d) => {
+    const osc = ctx.createOscillator();
+    osc.type = v.wave;
+    osc.detune.value = d;
+    osc.frequency.setValueAtTime(v.idle, t0);
+    osc.connect(filter);
+    osc.start(t0);
+    return osc;
+  });
+
+  const lfo = ctx.createOscillator();
+  lfo.frequency.value = v.lfoRate;
+  const lfoGain = ctx.createGain();
+  lfoGain.gain.value = 5;
+  lfo.connect(lfoGain);
+  oscs.forEach((o) => lfoGain.connect(o.detune));
+  lfo.start(t0);
+
+  // Optional tremolo: amplitude wobble for that air-cooled putt-putt feel
+  let tremLfo = null;
+  if (v.tremolo) {
+    tremLfo = ctx.createOscillator();
+    tremLfo.type = 'sine';
+    tremLfo.frequency.value = v.tremolo.rate;
+    const tremDepth = ctx.createGain();
+    tremDepth.gain.value = v.tremolo.depth * engineGainPeak;
+    tremLfo.connect(tremDepth);
+    tremDepth.connect(gain.gain);
+    tremLfo.start(t0);
+  }
+
+  const siren = v.siren ? createSiren(ctx, t0, v.siren) : null;
+  if (v.horn) playHorn(v.horn);
+
+  engine = { oscs, lfo, tremLfo, gain, filter, voice: v, siren };
+}
+
+function revEngine() {
+  if (!engine) return;
+  const ctx = getAudioCtx();
+  const t = ctx.currentTime;
+  const v = engine.voice;
+  engine.oscs.forEach((osc) => {
+    osc.frequency.cancelScheduledValues(t);
+    osc.frequency.setValueAtTime(osc.frequency.value, t);
+    osc.frequency.exponentialRampToValueAtTime(v.rev, t + 0.04);
+    osc.frequency.exponentialRampToValueAtTime(v.idle, t + 0.28);
+  });
+  const f = engine.filter.frequency;
+  f.cancelScheduledValues(t);
+  f.setValueAtTime(f.value, t);
+  f.exponentialRampToValueAtTime(v.cutoffRev, t + 0.04);
+  f.exponentialRampToValueAtTime(v.cutoffIdle, t + 0.28);
+}
+
+function stopEngine() {
+  if (!engine) return;
+  const { oscs, lfo, tremLfo, gain, siren } = engine;
+  const ctx = getAudioCtx();
+  const t = ctx.currentTime;
+  const stopAt = t + 0.12;
+  gain.gain.cancelScheduledValues(t);
+  gain.gain.setValueAtTime(gain.gain.value, t);
+  gain.gain.exponentialRampToValueAtTime(0.0005, stopAt);
+  oscs.forEach((o) => o.stop(stopAt + 0.05));
+  lfo.stop(stopAt + 0.05);
+  if (tremLfo) tremLfo.stop(stopAt + 0.05);
+  if (siren) {
+    siren.out.gain.cancelScheduledValues(t);
+    siren.out.gain.setValueAtTime(siren.out.gain.value, t);
+    siren.out.gain.exponentialRampToValueAtTime(0.0001, stopAt);
+    siren.carriers.forEach((c) => c.stop(stopAt + 0.05));
+    siren.lfo.stop(stopAt + 0.05);
+  }
+  engine = null;
 }
 
 function playWin() {
@@ -616,7 +855,7 @@ function renderCars() {
     // icon — emojis face left by default; flip horizontals to face the exit,
     // rotate verticals so they point along their axis
     const icon = document.createElement('span');
-    icon.textContent = car.target ? '🚗' : ['🚙','🚕','🚌','🚎','🏎️','🚐','🚑','🚒','🛻'][car.id % 9];
+    icon.textContent = car.target ? '🚗' : ['🚙','🚕','🚌','🚓','🏎️','🚐','🚑','🚒','🛻'][car.id % 9];
     icon.style.display = 'inline-block';
     icon.style.fontSize = Math.round(CELL * 0.85) + 'px';
     icon.style.lineHeight = '1';
@@ -732,7 +971,19 @@ function launchApplause() {
 }
 
 function attachDrag(el, car) {
-  let startX, startY, startCol, startRow, dragging = false;
+  let startX, startY, startCol, startRow, lastCol, lastRow, dragging = false;
+
+  const endDrag = () => {
+    if (!dragging) return;
+    dragging = false;
+    el.classList.remove('dragging');
+    stopEngine();
+    if (car.col !== startCol || car.row !== startRow) {
+      moveCount++;
+      moveCountEl.textContent = moveCount;
+      checkWin();
+    }
+  };
 
   el.addEventListener('pointerdown', e => {
     if (solvingMode) return;
@@ -740,11 +991,12 @@ function attachDrag(el, car) {
     dragging = true;
     startX = e.clientX;
     startY = e.clientY;
-    startCol = car.col;
-    startRow = car.row;
+    startCol = lastCol = car.col;
+    startRow = lastRow = car.row;
     el.setPointerCapture(e.pointerId);
     el.classList.add('dragging');
     clearHints();
+    startEngine(car);
   });
 
   el.addEventListener('pointermove', e => {
@@ -764,6 +1016,7 @@ function attachDrag(el, car) {
         car.col = startCol;
       }
       el.style.left = cellPx(car.col) + 'px';
+      if (car.col !== lastCol) { revEngine(); lastCol = car.col; }
     } else {
       const newRow = startRow + Math.round(dy / (CELL + GAP));
       const clamped = Math.max(0, Math.min(ROWS - car.len, newRow));
@@ -775,20 +1028,12 @@ function attachDrag(el, car) {
         car.row = startRow;
       }
       el.style.top = cellPx(car.row) + 'px';
+      if (car.row !== lastRow) { revEngine(); lastRow = car.row; }
     }
   });
 
-  el.addEventListener('pointerup', e => {
-    if (!dragging) return;
-    dragging = false;
-    el.classList.remove('dragging');
-    if (car.col !== startCol || car.row !== startRow) {
-      playMove();
-      moveCount++;
-      moveCountEl.textContent = moveCount;
-      checkWin();
-    }
-  });
+  el.addEventListener('pointerup', endDrag);
+  el.addEventListener('pointercancel', endDrag);
 }
 
 function clearHints() {
@@ -894,9 +1139,15 @@ async function showSolution() {
     await new Promise(r => setTimeout(r, 600));
     if (!solvingMode) break;
     if (el) el.classList.remove('hint-highlight');
-    playMove();
+    startEngine(car);
+    await new Promise(r => setTimeout(r, 80));
+    for (let i = 0; i < step.steps; i++) {
+      revEngine();
+      await new Promise(r => setTimeout(r, 110));
+    }
     moveCar(car, step.dir, step.steps);
-    await new Promise(r => setTimeout(r, 500));
+    await new Promise(r => setTimeout(r, 220));
+    stopEngine();
   }
 
   solvingMode = false;

@@ -1,4 +1,4 @@
-const CACHE_NAME = 'parking-jam-v14';
+const CACHE_NAME = 'parking-jam-v33';
 const ASSETS = [
   './',
   './index.html',
