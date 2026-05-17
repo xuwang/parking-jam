@@ -455,8 +455,27 @@ let solveTimer = null;
 let soundEnabled = true;
 const AudioCtx = window.AudioContext || window.webkitAudioContext;
 let audioCtx;
+let carEngineBuffer = null, _carEngineRaw = null;
+
+fetch('./car-engine.wav')
+  .then(r => r.arrayBuffer())
+  .then(ab => {
+    if (audioCtx) {
+      audioCtx.decodeAudioData(ab).then(buf => { carEngineBuffer = buf; }).catch(() => {});
+    } else {
+      _carEngineRaw = ab;
+    }
+  }).catch(() => {});
+
 function getAudioCtx() {
-  if (!audioCtx) audioCtx = new AudioCtx();
+  if (!audioCtx) {
+    audioCtx = new AudioCtx();
+    if (_carEngineRaw) {
+      audioCtx.decodeAudioData(_carEngineRaw)
+        .then(buf => { carEngineBuffer = buf; _carEngineRaw = null; })
+        .catch(() => {});
+    }
+  }
   if (audioCtx.state === 'suspended') audioCtx.resume();
   return audioCtx;
 }
@@ -623,12 +642,28 @@ function startEngine(car) {
   const t0 = ctx.currentTime;
   const v = carVoice(car);
 
+  // Real WAV sample for non-siren cars
+  if (!v.siren && carEngineBuffer) {
+    if (v.horn) playHorn(v.horn);
+    const source = ctx.createBufferSource();
+    source.buffer = carEngineBuffer;
+    source.loop = true;
+    const gain = ctx.createGain();
+    gain.gain.setValueAtTime(0.0001, t0);
+    gain.gain.exponentialRampToValueAtTime(0.6, t0 + 0.15);
+    source.connect(gain);
+    gain.connect(ctx.destination);
+    source.start(t0);
+    engine = { bufferSource: source, gain, voice: v, siren: null };
+    return;
+  }
+
+  // Oscillator-based engine for siren cars (ambulance, fire truck, police)
   const filter = ctx.createBiquadFilter();
   filter.type = 'lowpass';
   filter.frequency.setValueAtTime(v.cutoffIdle, t0);
   filter.Q.value = 3;
 
-  // Silence the engine drone for cars that only need a siren or horn
   const engineGainPeak = (v.siren || v.silent) ? 0.0001 : 0.16;
   const gain = ctx.createGain();
   gain.gain.setValueAtTime(0.0001, t0);
@@ -654,7 +689,6 @@ function startEngine(car) {
   oscs.forEach((o) => lfoGain.connect(o.detune));
   lfo.start(t0);
 
-  // Optional tremolo: amplitude wobble for that air-cooled putt-putt feel
   let tremLfo = null;
   if (v.tremolo) {
     tremLfo = ctx.createOscillator();
@@ -674,7 +708,7 @@ function startEngine(car) {
 }
 
 function revEngine() {
-  if (!engine) return;
+  if (!engine || engine.bufferSource) return;
   const ctx = getAudioCtx();
   const t = ctx.currentTime;
   const v = engine.voice;
@@ -693,16 +727,21 @@ function revEngine() {
 
 function stopEngine() {
   if (!engine) return;
-  const { oscs, lfo, tremLfo, gain, siren } = engine;
   const ctx = getAudioCtx();
   const t = ctx.currentTime;
   const stopAt = t + 0.12;
+  const { gain, siren } = engine;
   gain.gain.cancelScheduledValues(t);
   gain.gain.setValueAtTime(gain.gain.value, t);
   gain.gain.exponentialRampToValueAtTime(0.0005, stopAt);
-  oscs.forEach((o) => o.stop(stopAt + 0.05));
-  lfo.stop(stopAt + 0.05);
-  if (tremLfo) tremLfo.stop(stopAt + 0.05);
+  if (engine.bufferSource) {
+    engine.bufferSource.stop(stopAt + 0.05);
+  } else {
+    const { oscs, lfo, tremLfo } = engine;
+    oscs.forEach((o) => o.stop(stopAt + 0.05));
+    lfo.stop(stopAt + 0.05);
+    if (tremLfo) tremLfo.stop(stopAt + 0.05);
+  }
   if (siren) {
     siren.out.gain.cancelScheduledValues(t);
     siren.out.gain.setValueAtTime(siren.out.gain.value, t);
@@ -965,7 +1004,7 @@ function launchApplause() {
 }
 
 function attachDrag(el, car) {
-  let startX, startY, startCol, startRow, lastCol, lastRow, dragging = false;
+  let startX, startY, startCol, startRow, dragging = false;
 
   const endDrag = () => {
     if (!dragging) return;
@@ -985,8 +1024,8 @@ function attachDrag(el, car) {
     dragging = true;
     startX = e.clientX;
     startY = e.clientY;
-    startCol = lastCol = car.col;
-    startRow = lastRow = car.row;
+    startCol = car.col;
+    startRow = car.row;
     el.setPointerCapture(e.pointerId);
     el.classList.add('dragging');
     clearHints();
@@ -1010,7 +1049,6 @@ function attachDrag(el, car) {
         car.col = startCol;
       }
       el.style.left = cellPx(car.col) + 'px';
-      if (car.col !== lastCol) { revEngine(); lastCol = car.col; }
     } else {
       const newRow = startRow + Math.round(dy / (CELL + GAP));
       const clamped = Math.max(0, Math.min(ROWS - car.len, newRow));
@@ -1022,7 +1060,6 @@ function attachDrag(el, car) {
         car.row = startRow;
       }
       el.style.top = cellPx(car.row) + 'px';
-      if (car.row !== lastRow) { revEngine(); lastRow = car.row; }
     }
   });
 
