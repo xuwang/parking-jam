@@ -17,7 +17,7 @@ help:
 	@echo "  clean    - remove pid file and macOS junk"
 	@echo "  publish  - merge main into gh-pages and push to GitHub"
 
-serve:
+serve: stop
 	python3 -m http.server $(PORT) --bind $(HOST)
 
 start: stop
