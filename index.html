@@ -457,7 +457,7 @@ const AudioCtx = window.AudioContext || window.webkitAudioContext;
 let audioCtx;
 let carEngineBuffer = null, _carEngineRaw = null;
 
-fetch('./car-engine.wav')
+fetch('./car-engine.mp3')
   .then(r => r.arrayBuffer())
   .then(ab => {
     if (audioCtx) {
