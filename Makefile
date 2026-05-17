@@ -89,6 +89,6 @@ docker-push:
 publish:
 	@git checkout gh-pages
 	@git merge main --no-edit
-	@git push github gh-pages
+	@git push origin gh-pages
 	@git checkout main
 	@echo "published to https://xuwang.github.io/parking-jam/"
