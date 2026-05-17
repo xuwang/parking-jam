@@ -29,10 +29,7 @@ A small browser-based sliding-block puzzle. Move cars on a 6×6 grid to clear a 
 ├── sw.js           # service worker (offline cache)
 ├── icon-192.png    # PWA icon
 ├── icon-512.png    # PWA icon
-├── nginx.conf      # nginx config used inside the Docker image
-├── Dockerfile      # nginx:alpine static-server image
 ├── Makefile        # common ops
-└── .dockerignore
 ```
 
 ## Run locally
@@ -56,7 +53,6 @@ The game is a PWA, so once installed it launches full-screen from the home scree
 Pick one of:
 
 - **Local network (quickest):** on your Mac run `make start`, then `make lan` to print the LAN URL (e.g. `http://192.168.4.125:8000/`). Phone and Mac must be on the same Wi-Fi.
-- **Docker:** `make docker-run` then use the same `make lan` URL with `:8080`.
 - **Public URL:** deploy the static files anywhere (GitHub Pages, Netlify, Cloudflare Pages, S3+CloudFront, your own nginx). PWA install **requires HTTPS** for non-localhost origins, so a public deploy must serve over `https://`.
 
 ### 2. Open in Safari
@@ -95,7 +91,7 @@ Then on the phone: open the home-screen icon, pull down to refresh in Safari, or
 
 The same overall flow as iOS, but through Chrome's menu instead of a Share sheet, and the result is a real installed app (WebAPK) with its own launcher entry — not just a bookmark.
 
-1. Serve the files (same as iOS — `make start` + `make lan`, Docker, or a public HTTPS URL).
+1. Serve the files (same as iOS — `make start` + `make lan`, or a public HTTPS URL).
 2. Open the URL in **Chrome** (Edge, Samsung Internet, and Firefox also work).
 3. Either:
    - Wait a few seconds for Chrome's automatic **"Install app"** banner and tap it, or
@@ -103,18 +99,6 @@ The same overall flow as iOS, but through Chrome's menu instead of a Share sheet
 4. Confirm and the app appears in your launcher and app drawer.
 
 Updates and offline behavior are the same as iOS. To force-refresh after a code change, run `make bump` on your Mac, then reopen the app — Chrome picks up the new service worker on next launch.
-
-## Docker
-
-```sh
-make docker-build                       # build parking-jam:latest
-make docker-run                         # run on host port 8080
-make docker-stop
-make docker-run IMAGE=me/parking-jam TAG=v1 DOCKER_PORT=9000
-make docker-push IMAGE=me/parking-jam TAG=v1
-```
-
-The image is `nginx:1.27-alpine` serving the static files. `index.html` and `sw.js` are sent with `no-cache` so updates roll out immediately; icons get a 30-day cache.
 
 ## Editing levels
 
