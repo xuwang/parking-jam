@@ -98,13 +98,13 @@
   .car.dragging { cursor: grabbing; z-index: 100; filter: brightness(1.2) drop-shadow(0 0 8px rgba(255,255,255,0.3)); }
   .car.target {
     border: 3px solid #fff;
-    box-shadow: 0 0 0 2px #ef4444, 0 0 20px 4px rgba(239,68,68,0.7), 0 4px 16px rgba(0,0,0,0.4);
+    box-shadow: 0 0 0 2px #3b82f6, 0 0 20px 4px rgba(59,130,246,0.7), 0 4px 16px rgba(0,0,0,0.4);
     animation: target-glow 1.2s ease-in-out infinite alternate;
     z-index: 20;
   }
 
   @keyframes target-glow {
-    from { box-shadow: 0 0 0 2px #ef4444, 0 0 16px 4px rgba(239,68,68,0.6), 0 4px 16px rgba(0,0,0,0.4); }
+    from { box-shadow: 0 0 0 2px #3b82f6, 0 0 16px 4px rgba(59,130,246,0.6), 0 4px 16px rgba(0,0,0,0.4); }
     to   { box-shadow: 0 0 0 2px #ef4444, 0 0 28px 8px rgba(239,68,68,0.9), 0 4px 16px rgba(0,0,0,0.4); }
   }
   .car.hint-highlight { animation: pulse 0.6s ease-in-out infinite alternate; }
@@ -317,7 +317,7 @@ const LEVELS = [
   // Level 1 - very easy (2 moves)
   {
     cars: [
-      { id:0, col:0, row:2, len:2, horiz:true,  color:'#ef4444', target:true },
+      { id:0, col:0, row:2, len:2, horiz:true,  color:'#ffffff', target:true },
       { id:1, col:3, row:2, len:2, horiz:false, color:'#2563eb' },
       { id:2, col:0, row:0, len:2, horiz:true,  color:'#22c55e' },
       { id:3, col:4, row:4, len:2, horiz:true,  color:'#a855f7' },
@@ -327,7 +327,7 @@ const LEVELS = [
   // Level 2 (2 moves)
   {
     cars: [
-      { id:0, col:1, row:2, len:2, horiz:true,  color:'#ef4444', target:true },
+      { id:0, col:1, row:2, len:2, horiz:true,  color:'#ffffff', target:true },
       { id:1, col:3, row:0, len:2, horiz:false, color:'#2563eb' },
       { id:2, col:3, row:2, len:2, horiz:false, color:'#f97316' },
       { id:3, col:4, row:1, len:2, horiz:true,  color:'#22c55e' },
@@ -338,7 +338,7 @@ const LEVELS = [
   // Level 3 (3 moves)
   {
     cars: [
-      { id:0, col:0, row:2, len:2, horiz:true,  color:'#ef4444', target:true },
+      { id:0, col:0, row:2, len:2, horiz:true,  color:'#ffffff', target:true },
       { id:1, col:3, row:1, len:2, horiz:false, color:'#2563eb' },
       { id:2, col:5, row:2, len:2, horiz:false, color:'#f97316' },
       { id:3, col:0, row:0, len:3, horiz:true,  color:'#22c55e' },
@@ -350,7 +350,7 @@ const LEVELS = [
   // Level 4 (4 moves)
   {
     cars: [
-      { id:0, col:0, row:2, len:2, horiz:true,  color:'#ef4444', target:true },
+      { id:0, col:0, row:2, len:2, horiz:true,  color:'#ffffff', target:true },
       { id:1, col:2, row:2, len:2, horiz:false, color:'#2563eb' },
       { id:2, col:4, row:1, len:2, horiz:false, color:'#f97316' },
       { id:3, col:5, row:2, len:2, horiz:false, color:'#22c55e' },
@@ -362,7 +362,7 @@ const LEVELS = [
   // Level 5 (4 moves)
   {
     cars: [
-      { id:0, col:0, row:2, len:2, horiz:true,  color:'#ef4444', target:true },
+      { id:0, col:0, row:2, len:2, horiz:true,  color:'#ffffff', target:true },
       { id:1, col:2, row:1, len:2, horiz:false, color:'#2563eb' },
       { id:2, col:3, row:2, len:2, horiz:false, color:'#f97316' },
       { id:3, col:5, row:1, len:2, horiz:false, color:'#a855f7' },
@@ -375,7 +375,7 @@ const LEVELS = [
   // Level 6 (5 moves)
   {
     cars: [
-      { id:0, col:0, row:2, len:2, horiz:true,  color:'#ef4444', target:true },
+      { id:0, col:0, row:2, len:2, horiz:true,  color:'#ffffff', target:true },
       { id:1, col:2, row:2, len:2, horiz:false, color:'#2563eb' },
       { id:2, col:3, row:1, len:2, horiz:false, color:'#22c55e' },
       { id:3, col:4, row:2, len:2, horiz:false, color:'#f97316' },
@@ -389,7 +389,7 @@ const LEVELS = [
   // Level 7 (5 moves)
   {
     cars: [
-      { id:0, col:0, row:2, len:2, horiz:true,  color:'#ef4444', target:true },
+      { id:0, col:0, row:2, len:2, horiz:true,  color:'#ffffff', target:true },
       { id:1, col:2, row:2, len:2, horiz:false, color:'#2563eb' },
       { id:2, col:4, row:1, len:2, horiz:false, color:'#22c55e' },
       { id:3, col:5, row:2, len:2, horiz:false, color:'#f97316' },
@@ -403,7 +403,7 @@ const LEVELS = [
   // Level 8 (5 moves)
   {
     cars: [
-      { id:0, col:1, row:2, len:2, horiz:true,  color:'#ef4444', target:true },
+      { id:0, col:1, row:2, len:2, horiz:true,  color:'#ffffff', target:true },
       { id:1, col:3, row:1, len:2, horiz:false, color:'#2563eb' },
       { id:2, col:4, row:2, len:2, horiz:false, color:'#22c55e' },
       { id:3, col:5, row:1, len:2, horiz:false, color:'#f97316' },
@@ -418,7 +418,7 @@ const LEVELS = [
   // Level 9 (5 moves)
   {
     cars: [
-      { id:0, col:0, row:2, len:2, horiz:true,  color:'#ef4444', target:true },
+      { id:0, col:0, row:2, len:2, horiz:true,  color:'#ffffff', target:true },
       { id:1, col:2, row:2, len:2, horiz:false, color:'#2563eb' },
       { id:2, col:3, row:1, len:2, horiz:false, color:'#22c55e' },
       { id:3, col:4, row:2, len:2, horiz:false, color:'#f97316' },
@@ -432,7 +432,7 @@ const LEVELS = [
   // Level 10 (7 moves)
   {
     cars: [
-      { id:0, col:0, row:2, len:2, horiz:true,  color:'#ef4444', target:true },
+      { id:0, col:0, row:2, len:2, horiz:true,  color:'#ffffff', target:true },
       { id:1, col:2, row:1, len:2, horiz:false, color:'#2563eb' },
       { id:2, col:3, row:2, len:2, horiz:false, color:'#22c55e' },
       { id:3, col:4, row:1, len:2, horiz:false, color:'#f97316' },
@@ -511,10 +511,10 @@ function carVoice(car) {
   // Sawtooth for most; square for the target car (id=0) and every 3rd car for variety
   const wave = (car.id === 0 || car.id % 3 === 2) ? 'square' : 'sawtooth';
   const voice = { idle, rev, cutoffIdle, cutoffRev, detune, lfoRate, wave };
-  // Player car (red target 🚗): only an assertive horn honk on pickup, no engine drone
+  // Player car (ambulance 🚑): two-tone siren while moving, no engine drone
   if (car.target) {
     voice.silent = true;
-    voice.horn = { tones: [300], gap: 0, dur: 0.45, gain: 0.28 };
+    voice.siren = { type: 'twotone', high: 980, low: 720, rate: 2.0, gain: 0.32 };
   }
   // Taxi (id 1 = 🚕): impatient dual-tone NYC cab honk — 3 quick BWAAH!s on pickup
   if (car.id === 1) {
@@ -528,11 +528,9 @@ function carVoice(car) {
     voice.horn = { tones: [392, 392, 392], gap: 0.11, dur: 0.13, gain: 0.24, chord: true };
   }
   // Emergency vehicles by icon:
-  // id 7 = 🚒 fire engine (wail), id 6 = 🚑 ambulance (two-tone), id 3 = 🚓 police (yelp)
+  // id 7 = 🚒 fire engine (wail), id 3 = 🚓 police (yelp)
   if (car.id === 7) {
     voice.siren = { type: 'wail', carrier: 780, depth: 320, rate: 1.6, gain: 0.35 };
-  } else if (car.id === 6) {
-    voice.siren = { type: 'twotone', high: 980, low: 720, rate: 2.0, gain: 0.32 };
   } else if (car.id === 3) {
     voice.siren = { type: 'yelp', carrier: 850, depth: 280, rate: 4.5, gain: 0.32 };
   }
@@ -840,22 +838,18 @@ function renderCars() {
     el.style.height = h + 'px';
     el.style.left = cellPx(car.col) + 'px';
     el.style.top = cellPx(car.row) + 'px';
-    // target car is solid; others are semi-transparent frosted glass
-    if (car.target) {
-      el.style.background = car.color;
-    } else {
-      const r = parseInt(car.color.slice(1,3),16);
-      const g = parseInt(car.color.slice(3,5),16);
-      const b = parseInt(car.color.slice(5,7),16);
-      el.style.background = `rgba(${r},${g},${b},0.45)`;
-      el.style.backdropFilter = 'blur(2px)';
-      el.style.webkitBackdropFilter = 'blur(2px)';
-    }
+    const r = parseInt(car.color.slice(1,3),16);
+    const g = parseInt(car.color.slice(3,5),16);
+    const b = parseInt(car.color.slice(5,7),16);
+    const alpha = car.target ? 0.18 : 0.45;
+    el.style.background = `rgba(${r},${g},${b},${alpha})`;
+    el.style.backdropFilter = 'blur(2px)';
+    el.style.webkitBackdropFilter = 'blur(2px)';
 
     // icon — emojis face left by default; flip horizontals to face the exit,
     // rotate verticals so they point along their axis
     const icon = document.createElement('span');
-    icon.textContent = car.target ? '🚗' : ['🚙','🚕','🚌','🚓','🏎️','🚐','🚑','🚒','🛻'][car.id % 9];
+    icon.textContent = car.target ? '🚑' : ['🚙','🚕','🚌','🚓','🏎️','🚐','🚗','🚒','🛻'][car.id % 9];
     icon.style.display = 'inline-block';
     icon.style.fontSize = Math.round(CELL * 0.85) + 'px';
     icon.style.lineHeight = '1';
